@@ -346,7 +346,7 @@ class Game:
         self.field[self.nrows - 1, 0], 
         self.field[self.nrows - 1, self.ncols - 1]]
 
-        # If all corner cells were opened, pick a random cell
+        # If all corner cells are opened, pick a random cell
         if corner[0].value != 'covered' and \
            corner[1].value != 'covered' and \
            corner[2].value != 'covered' and \
