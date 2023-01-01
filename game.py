@@ -1,8 +1,6 @@
 import random
-import time
 
 import numpy as np
-
 import pyautogui
 import termcolor
 
@@ -56,6 +54,7 @@ class Cell:
         self.r, self.c = r, c
         self.value = 'covered' # 0-8, covered, flag
 
+
 class Game:
     ''' Game class hold information about the game current state,
     methods to solve the field from the current state
@@ -74,6 +73,9 @@ class Game:
             for col in range(self.ncols):
                 self.field[row, col] = Cell(row, col)
 
+#=========================================
+# Part A: Take screenshot and update field
+#=========================================
     def get_value(self, img, cell):
         ''' Get the current state of a cell from screenshot
         Return: cell value
@@ -133,9 +135,12 @@ class Game:
         # print()
         # print()
 
+#=========================================
+# Part B: Helper functions
+#=========================================
     def num_all_covered(self):
         ''' Purpose: exit game
-        Return: number all covered cells on the field
+        Return: number of all covered cells on the field
         '''
         count = 0
 
@@ -171,6 +176,17 @@ class Game:
                 covered_neighbors.append(neighbor)
 
         return covered_neighbors
+
+    def get_numbered_neighbors(self, cell):
+        ''' Return a list of "number" neighbor cells
+        '''
+        numbered_neighbors = []
+
+        for neighbor in self.get_neighbors(cell):
+            if neighbor.value != 'covered' and neighbor.value != 'flag':
+                numbered_neighbors.append(neighbor)
+
+        return numbered_neighbors
     
     def get_border(self):
         ''' Return a list of border cells
@@ -184,6 +200,17 @@ class Game:
                         border.append(cell)
 
         return list(set(border))
+
+    def get_frontier(self):
+        ''' Return a list of frontier cells
+        '''
+        frontier = []
+        
+        for cell in self.get_border():
+            for neighbor in self.get_covered_neighbors(cell):
+                frontier.append(neighbor)
+        
+        return list(set(frontier))
 
     def is_subgroup(self, cell_1, cell_2):
         ''' Check if uncovered neighbors of cell 1 is a subgroup of 
@@ -218,7 +245,18 @@ class Game:
         ''' Return: int(number of mines left around a cell)
         '''
         return int(cell.value) - self.get_num_flag(cell)
+    
+    def backtrack_helper_1(self, cell):
+        pass
+        # TODO: your code here
 
+    def backtrack_helper_2(self, cell):
+        pass
+        # TODO: your code here
+
+#=========================================
+# Part C: Solve algorithm
+#=========================================
     def method_naive(self):
         ''' Basic algorithm to solve minesweeper
         Return: list of safe and mine celss
@@ -262,9 +300,40 @@ class Game:
         
         return list(set(safe)), list(set(mines))
     
-    def method_backtracking(self):
-        pass
-        # TODO: your code here
+    def method_backtrack(self):
+        ''' Enumerate all possible configuration of frontier cells
+        Return: list of safe and mine cells
+        '''
+        safe, mines = [], []
+        res = []
+        cell_list = self.get_frontier()
+        frontier = []
+        for cell in cell_list:
+            frontier.append(0) # Create frontier has same length as cell_list
+
+        def backtrack(index): # Use zip to get column
+            # Exit condition
+            if index == len(frontier):
+                res.append(frontier)
+                return
+
+            # Recursive backtrack
+            if self.backtrack_helper_1(cell_list[index]): # Just enough flags (value = flag)
+                cell_list[index].value = 'covered'
+                frontier[index] = 'covered'
+                backtrack(index + 1)
+            elif self.backtrack_helper_2(cell_list[index]): # Not enough flags (value = flag + UNVISITED)
+                cell_list[index].value = 'flag'
+                frontier[index] = 'flag'
+                backtrack(index + 1)
+            else:
+                for value in ['covered', 'flag']:
+                    cell_list[index].value = value 
+                    frontier[index] = value
+                    backtrack(index + 1)
+            backtrack(0)
+
+        return list(set(safe)), list(set(mines))
 
     def method_random(self):
         ''' Pick a random cell, prefer corner(for opening)
@@ -302,6 +371,7 @@ class Game:
         '''
         # methods = [(self.method_naive, 'Naive')
         # , (self.method_group, 'Group')
+        # , (self.method_backtrack, 'Backtrack')
         # , (self.method_random, 'Random')]
 
         # for method, method_name in methods:
@@ -310,7 +380,9 @@ class Game:
         #         print(method_name)
         #         break
         
-        methods = [self.method_naive, self.method_group, self.method_random]
+        methods = [self.method_naive, self.method_group, self.method_backtrack,
+        self.method_random]
+
         for method in methods:
             safe, mines = method()
             if safe or mines:
@@ -319,7 +391,7 @@ class Game:
         for cell in safe:
             self.click(cell, 'left')
         for cell in mines:
-            #self.click(cell, 'right')
+            # self.click(cell, 'right')
             cell.value = 'flag'
             self.nmines -= 1
 

@@ -30,9 +30,7 @@ if __name__ == '__main__':
     # Calculate width and height of a cell
     width, height = (right - left) / ncols, (bottom - top) / nrows
 
-    # Play the game (this was a mess because the screenshot fuction
-    # run before solve function but somehow this still work. Don't
-    # ask me why :v )
+    # Play the game
     num_all_covered = 1000
     game = Game(nrows, ncols, nmines, width, height, left, top)
     while True:
