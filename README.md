@@ -5,7 +5,7 @@ Table of Contents
 
 ## Installation
 Follow these steps:
-1. Make sure that [numpy](https://pypi.org/project/numpy/) are installed in your anaconda environment
+1. Make sure that [numpy](https://pypi.org/project/numpy/) and [Pillow](https://pypi.org/project/Pillow/) are installed in your anaconda environment
 2. Install [PyAutoGUI](https://pypi.org/project/PyAutoGUI/), [keyboard](https://pypi.org/project/keyboard/) and [termcolor](https://pypi.org/project/termcolor/) packages 
 ```sh
    pip install PyAutoGUI
@@ -13,11 +13,10 @@ Follow these steps:
    pip install termcolor
 ```
 3. Clone the repository `git clone https://github.com/minnchan1403/AI-intro-project.git`
-4. Extract file minesweeper-x.zip
 
 ## Compile/Run
 Follow these steps:
-1. Open minesweeper-x with default skin
+1. Open [minesweeperonline](https://minesweeperonline.com/)
 2. Open terminal and run `python main.py game_mode`
 For example: 
 ```sh
