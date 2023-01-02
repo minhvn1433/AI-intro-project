@@ -472,9 +472,9 @@ class Game:
         pyautogui.click(x_center, y_center, button = button)
         
         
-    def get_starting_point(self,starting_point):#random starting point
-		if not starting_point:
-			start_x = random.randint(0,self.cols-1)
-			start_y = random.randint(0,self.rows-1)
-			starting_point = (start_x,start_y)
-		return starting_point
+    # def get_starting_point(self,starting_point):#random starting point
+	# 	if not starting_point:
+	# 		start_x = random.randint(0,self.cols-1)
+	# 		start_y = random.randint(0,self.rows-1)
+	# 		starting_point = (start_x,start_y)
+	# 	return starting_point
