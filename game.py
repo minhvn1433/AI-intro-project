@@ -1,4 +1,5 @@
 import random
+import copy
 
 import numpy as np
 import pyautogui
@@ -53,6 +54,7 @@ class Cell:
         '''
         self.r, self.c = r, c
         self.value = 'covered' # 0-8, covered, flag
+        self.visited = False # For backtrack
 
 
 class Game:
@@ -245,21 +247,46 @@ class Game:
         ''' Return: int(number of mines left around a cell)
         '''
         return int(cell.value) - self.get_num_flag(cell)
+
+    def get_num_unvisited(self, cell):
+        ''' Return: int(number of unvisited around a cell)
+        '''
+        count = 0
+
+        for neighbor in self.get_covered_neighbors(cell):
+            if neighbor.visited == False:
+                count += 1
+
+        return count
     
     def backtrack_helper_1(self, cell):
-        pass
-        # TODO: your code here
+        ''' Return: boolean
+        '''
+        res = False
+
+        for neighbor in self.get_numbered_neighbors(cell):
+            if int(neighbor.value) == self.get_num_flag(neighbor):
+                res = True
+
+        return res
 
     def backtrack_helper_2(self, cell):
-        pass
-        # TODO: your code here
+        ''' Return: boolean
+        '''
+        res = False
+
+        for neighbor in self.get_numbered_neighbors(cell):
+            if int(neighbor.value) == self.get_num_flag(neighbor) + self.get_num_unvisited(neighbor):
+                res = True
+
+        return res
 
 #=========================================
 # Part C: Solve algorithm
 #=========================================
     def method_naive(self):
         ''' Basic algorithm to solve minesweeper
-        Return: list of safe and mine celss
+        Return: list of safe and mine cells
         '''
         safe, mines = [], []
         
@@ -307,33 +334,77 @@ class Game:
         safe, mines = [], []
         res = []
         cell_list = self.get_frontier()
+        if len(cell_list) > 39:
+            return [], []
+        # for cell in cell_list:
+        #     print(cell.r, cell.c)
         frontier = []
         for cell in cell_list:
             frontier.append(0) # Create frontier has same length as cell_list
 
-        def backtrack(index): # Use zip to get column
+        def backtrack(index):
             # Exit condition
             if index == len(frontier):
-                res.append(frontier)
+                res.append(copy.copy(frontier))
                 return
 
             # Recursive backtrack
-            if self.backtrack_helper_1(cell_list[index]): # Just enough flags (value = flag)
+            if self.backtrack_helper_1(cell_list[index]) and \
+                self.backtrack_helper_2(cell_list[index]):
+                return
+            if self.backtrack_helper_1(cell_list[index]): # Just enough flags
                 cell_list[index].value = 'covered'
+                cell_list[index].visited = True
                 frontier[index] = 'covered'
                 backtrack(index + 1)
-            elif self.backtrack_helper_2(cell_list[index]): # Not enough flags (value = flag + UNVISITED)
+                cell_list[index].value = 'covered'
+                cell_list[index].visited = False
+            elif self.backtrack_helper_2(cell_list[index]): # Not enough flags
                 cell_list[index].value = 'flag'
+                cell_list[index].visited = True
                 frontier[index] = 'flag'
                 backtrack(index + 1)
+                cell_list[index].value = 'covered'
+                cell_list[index].visited = False
             else:
                 for value in ['covered', 'flag']:
                     cell_list[index].value = value 
+                    cell_list[index].visited = True
                     frontier[index] = value
                     backtrack(index + 1)
-            backtrack(0)
+                    cell_list[index].value = 'covered'
+                    cell_list[index].visited = False
+        backtrack(0)
+
+        # Reset all cell
+        for cell in cell_list:
+            cell.visited = False
+            cell.value = 'covered'
+        
+        # for ele in res:
+        #     print(ele)
+        array = np.array(res).transpose()
+        value_list = []
+        for row in array:
+            bool = np.all(row == row[0])
+            if bool:
+                value_list.append(row[0])
+            else:
+                value_list.append([])
+
+        index = -1
+        for ele in value_list:
+            index += 1
+            if ele == 'covered':
+                safe.append(cell_list[index])
+            if ele == 'flag':
+                mines.append(cell_list[index])
 
         return list(set(safe)), list(set(mines))
+    
+    def method_csp(self):
+        pass
+        # TODO: your code here
 
     def method_random(self):
         ''' Pick a random cell, prefer corner(for opening)
@@ -369,10 +440,10 @@ class Game:
     def solve(self):
         ''' Go through all methods, then open safe cells and flag mine cells
         '''
-        # methods = [(self.method_naive, 'Naive')
-        # , (self.method_group, 'Group')
-        # , (self.method_backtrack, 'Backtrack')
-        # , (self.method_random, 'Random')]
+        # methods = [(self.method_naive, 'Naive'),
+        # (self.method_group, 'Group'),
+        # (self.method_backtrack, 'Backtrack'),
+        # (self.method_random, 'Random')]
 
         # for method, method_name in methods:
         #     safe, mines = method()
