@@ -132,10 +132,10 @@ class Game:
                         value = '.'
                     else: 
                         cell.value = value
-        #         print(termcolor.colored(value, colors_dict[str(value)]), end = ' ')
-        #     print()
-        # print()
-        # print()
+                print(termcolor.colored(value, colors_dict[str(value)]), end = ' ')
+            print()
+        print()
+        print()
 
 #=========================================
 # Part B: Helper functions
@@ -336,8 +336,6 @@ class Game:
         cell_list = self.get_frontier()
         if len(cell_list) > 39:
             return [], []
-        # for cell in cell_list:
-        #     print(cell.r, cell.c)
         frontier = []
         for cell in cell_list:
             frontier.append(0) # Create frontier has same length as cell_list
@@ -381,8 +379,6 @@ class Game:
             cell.visited = False
             cell.value = 'covered'
         
-        # for ele in res:
-        #     print(ele)
         array = np.array(res).transpose()
         value_list = []
         for row in array:
@@ -401,10 +397,6 @@ class Game:
                 mines.append(cell_list[index])
 
         return list(set(safe)), list(set(mines))
-    
-    def method_csp(self):
-        pass
-        # TODO: your code here
 
     def method_random(self):
         ''' Pick a random cell, prefer corner(for opening)
@@ -440,29 +432,21 @@ class Game:
     def solve(self):
         ''' Go through all methods, then open safe cells and flag mine cells
         '''
-        # methods = [(self.method_naive, 'Naive'),
-        # (self.method_group, 'Group'),
-        # (self.method_backtrack, 'Backtrack'),
-        # (self.method_random, 'Random')]
+        methods = [(self.method_naive, 'Naive'),
+        (self.method_group, 'Group'),
+        (self.method_backtrack, 'Backtrack'),
+        (self.method_random, 'Random')]
 
-        # for method, method_name in methods:
-        #     safe, mines = method()
-        #     if safe or mines:
-        #         print(method_name)
-        #         break
-        
-        methods = [self.method_naive, self.method_group, self.method_backtrack,
-        self.method_random]
-
-        for method in methods:
+        for method, method_name in methods:
             safe, mines = method()
             if safe or mines:
+                print(method_name)
                 break
 
         for cell in safe:
             self.click(cell, 'left')
         for cell in mines:
-            # self.click(cell, 'right')
+            self.click(cell, 'right')
             cell.value = 'flag'
             self.nmines -= 1
 
@@ -470,11 +454,3 @@ class Game:
         y_center = self.top + cell.r * self.height + 0.5 * self.height
         x_center = self.left + cell.c * self.width + 0.5 * self.width
         pyautogui.click(x_center, y_center, button = button)
-        
-        
-    # def get_starting_point(self,starting_point):#random starting point
-	# 	if not starting_point:
-	# 		start_x = random.randint(0,self.cols-1)
-	# 		start_y = random.randint(0,self.rows-1)
-	# 		starting_point = (start_x,start_y)
-	# 	return starting_point
