@@ -334,7 +334,7 @@ class Game:
         safe, mines = [], []
         res = []
         cell_list = self.get_frontier()
-        if len(cell_list) > 39:
+        if len(cell_list) > 39 or len(cell_list) == 0: # Early break
             return [], []
         frontier = []
         for cell in cell_list:
@@ -379,22 +379,40 @@ class Game:
             cell.visited = False
             cell.value = 'covered'
         
+        # Create a probability list for each cell
         array = np.array(res).transpose()
-        value_list = []
+        probability_list = []
         for row in array:
-            bool = np.all(row == row[0])
-            if bool:
-                value_list.append(row[0])
-            else:
-                value_list.append([])
+            count = 0
+            for ele in row:
+                if ele == 'covered':
+                    count += 1
+            probability = round(count / len(row), 2)
+            probability_list.append(probability)
 
-        index = -1
-        for ele in value_list:
-            index += 1
-            if ele == 'covered':
+        # Check if field is solvable
+        def is_solvable():
+            res = False
+            for probability in probability_list:
+                if probability == 1 or probability == 0:
+                    res = True
+            return res
+
+        # First case: no need luck to solve
+        if is_solvable():
+            index = 0
+            for probability in probability_list:
+                if probability == 1:
+                    safe.append(cell_list[index])
+                if probability == 0:
+                    mines.append(cell_list[index])
+                index += 1
+        # Second case: need luck. Find safe cell
+        else:
+            if max(probability_list) > (1 - (self.nmines / self.num_all_covered())):
+                index = probability_list.index(max(probability_list))
                 safe.append(cell_list[index])
-            if ele == 'flag':
-                mines.append(cell_list[index])
+                print(max(probability_list))
 
         return list(set(safe)), list(set(mines))
 
