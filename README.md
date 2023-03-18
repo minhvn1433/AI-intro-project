@@ -25,4 +25,4 @@ For example:
    python main.py expert
 ```
 3. Move mouse cursor to top left corner of the grid, press enter
-4. Move mouse cursor to bottom right corner of the grid, press enter
+4. Move mouse cursor to bottom right corner of the grid, press enter 
