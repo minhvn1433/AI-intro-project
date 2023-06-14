@@ -1,8 +1,3 @@
-Table of Contents
-- [Installation](#installation)
-- [Compile/Run](#compilerun)
-
-
 ## Installation
 Follow these steps:
 1. Make sure that [numpy](https://pypi.org/project/numpy/) and [Pillow](https://pypi.org/project/Pillow/) are installed
